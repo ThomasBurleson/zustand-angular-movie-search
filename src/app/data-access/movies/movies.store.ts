@@ -31,10 +31,13 @@ export class MoviesStore {
     const store: StoreApi<MovieViewModel> = buildStoreEngine(this.movieAPI);
     const { loadMovies, searchBy } = store.getState();
 
-    loadMovies(searchBy);
+    loadMovies(searchBy);  // initial auto-load
 
     return new Observable((subscriber) => {
-      store.subscribe((vm: MovieViewModel) => subscriber.next(vm));
+      const watchStore = (vm: MovieViewModel) => subscriber.next(vm);
+      const stopWatching = store.subscribe(watchStore);
+      
+      return () => stopWatching();
     });
   }
 }
